@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WanderLux – Premium Travel Agency</title>
+<link rel="stylesheet" href="style.css">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+<!-- ══════════════════ NAVBAR ══════════════════ -->
+<nav class="navbar" id="navbar">
+  <div class="nav-brand">
+    <i class="fas fa-globe-asia"></i>
+    <span>WanderLux</span>
+  </div>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="#" onclick="showPage('home')">Home</a></li>
+    <li><a href="#" onclick="showPage('packages')">Packages</a></li>
+    <li><a href="#" onclick="showPage('packages')">Destinations</a></li>
+    <li><a href="#" onclick="showPage('packages')">Deals</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <div class="nav-auth" id="navAuth">
+    <button class="btn-outline" onclick="openModal('loginModal')">Login</button>
+    <button class="btn-primary" onclick="openModal('signupModal')">Sign Up</button>
+  </div>
+  <div class="nav-user hidden" id="navUser">
+    <span id="userGreet"></span>
+    <button class="btn-outline" onclick="showPage('mybookings')"><i class="fas fa-suitcase"></i> My Trips</button>
+    <button class="btn-primary" onclick="logout()">Logout</button>
+  </div>
+  <div class="hamburger" onclick="toggleMenu()"><i class="fas fa-bars"></i></div>
+</nav>
+
+<!-- ══════════════════ HOME PAGE ══════════════════ -->
+<div id="homePage" class="page active">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <p class="hero-sub">Discover The World With Us</p>
+      <h1 class="hero-title">Your Dream Journey<br><span>Starts Here</span></h1>
+      <p class="hero-desc">Curated travel experiences for every kind of traveler. Beaches, mountains, islands & more.</p>
+      <div class="hero-btns">
+        <button class="btn-hero-primary" onclick="showPage('packages')">Explore Packages</button>
+        <button class="btn-hero-outline" onclick="scrollToSection('featured')">View Deals</button>
+      </div>
+    </div>
+    <div class="hero-search">
+      <div class="search-box">
+        <div class="search-field">
+          <label><i class="fas fa-map-marker-alt"></i> Destination</label>
+          <select id="heroDestination">
+            <option value="">Where to go?</option>
+            <option>Maldives</option><option>Bali</option><option>Switzerland</option>
+            <option>Santorini</option><option>Himalayas</option><option>Lakshadweep</option>
+            <option>Thailand</option><option>New Zealand</option><option>Iceland</option>
+          </select>
+        </div>
+        <div class="search-field">
+          <label><i class="fas fa-users"></i> Travelers</label>
+          <select id="heroTravelers">
+            <option>Solo</option><option>Couple</option><option>Family</option><option>Friends</option>
+          </select>
+        </div>
+        <div class="search-field">
+          <label><i class="fas fa-calendar"></i> Travel Date</label>
+          <input type="date" id="heroDate">
+        </div>
+        <button class="btn-search" onclick="showPage('packages')"><i class="fas fa-search"></i> Search</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- STATS -->
+  <section class="stats-bar">
+    <div class="stat"><span class="stat-num">12K+</span><span>Happy Travelers</span></div>
+    <div class="stat"><span class="stat-num">150+</span><span>Destinations</span></div>
+    <div class="stat"><span class="stat-num">98%</span><span>Satisfaction Rate</span></div>
+    <div class="stat"><span class="stat-num">24/7</span><span>Customer Support</span></div>
+  </section>
+
+  <!-- CATEGORIES -->
+  <section class="section" id="categories">
+    <div class="section-header">
+      <h2>Browse by Category</h2>
+      <p>Find your perfect destination by type</p>
+    </div>
+    <div class="category-grid">
+      <div class="cat-card beach" onclick="filterPackages('beach')">
+        <div class="cat-overlay"></div>
+        <div class="cat-info">
+          <i class="fas fa-umbrella-beach"></i>
+          <h3>Beach</h3>
+          <p>18 destinations</p>
+        </div>
+      </div>
+      <div class="cat-card mountain" onclick="filterPackages('mountain')">
+        <div class="cat-overlay"></div>
+        <div class="cat-info">
+          <i class="fas fa-mountain"></i>
+          <h3>Mountain</h3>
+          <p>12 destinations</p>
+        </div>
+      </div>
+      <div class="cat-card island" onclick="filterPackages('island')">
+        <div class="cat-overlay"></div>
+        <div class="cat-info">
+          <i class="fas fa-water"></i>
+          <h3>Island</h3>
+          <p>15 destinations</p>
+        </div>
+      </div>
+      <div class="cat-card city" onclick="filterPackages('city')">
+        <div class="cat-overlay"></div>
+        <div class="cat-info">
+          <i class="fas fa-city"></i>
+          <h3>City</h3>
+          <p>20 destinations</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TRAVELER TYPES -->
+  <section class="section traveler-section">
+    <div class="section-header">
+      <h2>Travel Your Way</h2>
+      <p>Packages designed for every kind of journey</p>
+    </div>
+    <div class="traveler-grid">
+      <div class="traveler-card" onclick="filterByTraveler('solo')">
+        <div class="traveler-img solo-bg"></div>
+        <h3><i class="fas fa-user"></i> Solo</h3>
+        <p>Adventure & self-discovery</p>
+        <span class="from-price">From ₹15,999</span>
+      </div>
+      <div class="traveler-card" onclick="filterByTraveler('couple')">
+        <div class="traveler-img couple-bg"></div>
+        <h3><i class="fas fa-heart"></i> Couples</h3>
+        <p>Romantic escapes for two</p>
+        <span class="from-price">From ₹24,999</span>
+      </div>
+      <div class="traveler-card" onclick="filterByTraveler('family')">
+        <div class="traveler-img family-bg"></div>
+        <h3><i class="fas fa-home"></i> Family</h3>
+        <p>Memories that last forever</p>
+        <span class="from-price">From ₹39,999</span>
+      </div>
+      <div class="traveler-card" onclick="filterByTraveler('friends')">
+        <div class="traveler-img friends-bg"></div>
+        <h3><i class="fas fa-user-friends"></i> Friends</h3>
+        <p>Group adventures & fun</p>
+        <span class="from-price">From ₹18,999</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURED PACKAGES -->
+  <section class="section" id="featured">
+    <div class="section-header">
+      <h2>Featured Packages</h2>
+      <p>Hand-picked deals just for you</p>
+    </div>
+    <div class="packages-grid" id="featuredGrid"></div>
+    <div class="center-btn">
+      <button class="btn-primary large" onclick="showPage('packages')">View All Packages →</button>
+    </div>
+  </section>
+
+  <!-- WHY US -->
+  <section class="section why-section">
+    <div class="section-header">
+      <h2>Why Choose WanderLux?</h2>
+    </div>
+    <div class="why-grid">
+      <div class="why-card"><i class="fas fa-shield-alt"></i><h3>Safe & Trusted</h3><p>100% secure bookings with full insurance coverage</p></div>
+      <div class="why-card"><i class="fas fa-tags"></i><h3>Best Price</h3><p>Price match guarantee on all packages</p></div>
+      <div class="why-card"><i class="fas fa-headset"></i><h3>24/7 Support</h3><p>Dedicated travel experts always on call</p></div>
+      <div class="why-card"><i class="fas fa-star"></i><h3>Top Rated</h3><p>4.9/5 average from 12,000+ reviews</p></div>
+    </div>
+  </section>
+
+  <!-- TESTIMONIALS -->
+  <section class="section testimonials">
+    <div class="section-header"><h2>What Travelers Say</h2></div>
+    <div class="testi-grid">
+      <div class="testi-card">
+        <div class="stars">★★★★★</div>
+        <p>"The Maldives package was absolutely breathtaking. Every detail was perfectly arranged!"</p>
+        <div class="testi-author"><img src="https://i.pravatar.cc/48?img=1"><span>Priya Sharma, Mumbai</span></div>
+      </div>
+      <div class="testi-card">
+        <div class="stars">★★★★★</div>
+        <p>"Booked the Himalayas trek as a solo traveler. Best decision of my life. Super safe!"</p>
+        <div class="testi-author"><img src="https://i.pravatar.cc/48?img=3"><span>Arjun Mehta, Delhi</span></div>
+      </div>
+      <div class="testi-card">
+        <div class="stars">★★★★★</div>
+        <p>"Family trip to Bali was magical. Kids loved it and the arrangements were flawless."</p>
+        <div class="testi-author"><img src="https://i.pravatar.cc/48?img=5"><span>Sunita Rao, Bangalore</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section class="section contact-section" id="contact">
+    <div class="contact-inner">
+      <div class="contact-info">
+        <h2>Get In Touch</h2>
+        <p>Let our travel experts plan your dream vacation</p>
+        <div class="contact-items">
+          <div><i class="fas fa-phone"></i><span>+91 98765 43210</span></div>
+          <div><i class="fas fa-envelope"></i><span>hello@wanderlux.com</span></div>
+          <div><i class="fas fa-map-marker-alt"></i><span>Mumbai, Maharashtra, India</span></div>
+        </div>
+      </div>
+      <div class="contact-form">
+        <input type="text" placeholder="Your Name">
+        <input type="email" placeholder="Email Address">
+        <input type="text" placeholder="Dream Destination">
+        <textarea placeholder="Tell us about your trip..."></textarea>
+        <button class="btn-primary">Send Message</button>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- ══════════════════ PACKAGES PAGE ══════════════════ -->
+<div id="packagesPage" class="page">
+  <div class="page-hero packages-hero">
+    <div class="hero-overlay"></div>
+    <h1>Explore All Packages</h1>
+    <p>Find the perfect trip for every budget and style</p>
+  </div>
+  <div class="packages-main">
+    <!-- FILTERS -->
+    <div class="filter-bar">
+      <div class="filter-group">
+        <label>Category</label>
+        <div class="filter-pills" id="catFilter">
+          <button class="pill active" onclick="setFilter('cat','all',this)">All</button>
+          <button class="pill" onclick="setFilter('cat','beach',this)"><i class="fas fa-umbrella-beach"></i> Beach</button>
+          <button class="pill" onclick="setFilter('cat','mountain',this)"><i class="fas fa-mountain"></i> Mountain</button>
+          <button class="pill" onclick="setFilter('cat','island',this)"><i class="fas fa-water"></i> Island</button>
+          <button class="pill" onclick="setFilter('cat','city',this)"><i class="fas fa-city"></i> City</button>
+        </div>
+      </div>
+      <div class="filter-group">
+        <label>Traveler Type</label>
+        <div class="filter-pills">
+          <button class="pill active" onclick="setFilter('traveler','all',this)">All</button>
+          <button class="pill" onclick="setFilter('traveler','solo',this)"><i class="fas fa-user"></i> Solo</button>
+          <button class="pill" onclick="setFilter('traveler','couple',this)"><i class="fas fa-heart"></i> Couple</button>
+          <button class="pill" onclick="setFilter('traveler','family',this)"><i class="fas fa-home"></i> Family</button>
+          <button class="pill" onclick="setFilter('traveler','friends',this)"><i class="fas fa-user-friends"></i> Friends</button>
+        </div>
+      </div>
+      <div class="filter-group">
+        <label>Budget Range</label>
+        <div class="filter-pills">
+          <button class="pill active" onclick="setFilter('budget','all',this)">All</button>
+          <button class="pill" onclick="setFilter('budget','budget',this)">₹10k–25k</button>
+          <button class="pill" onclick="setFilter('budget','mid',this)">₹25k–60k</button>
+          <button class="pill" onclick="setFilter('budget','luxury',this)">₹60k+</button>
+        </div>
+      </div>
+    </div>
+    <div class="packages-grid" id="allPackagesGrid"></div>
+  </div>
+</div>
+
+<!-- ══════════════════ PACKAGE DETAIL PAGE ══════════════════ -->
+<div id="detailPage" class="page">
+  <div id="detailContent"></div>
+</div>
+
+<!-- ══════════════════ BOOKING PAGE ══════════════════ -->
+<div id="bookingPage" class="page">
+  <div class="booking-container">
+    <h1 class="booking-title"><i class="fas fa-suitcase"></i> Book Your Trip</h1>
+    <div class="booking-layout">
+      <div class="booking-form-wrap">
+        <div class="form-section">
+          <h3><span class="step-badge">1</span> Personal Details</h3>
+          <div class="form-row">
+            <div class="form-field"><label>Full Name</label><input type="text" id="bkName" placeholder="As per ID"></div>
+            <div class="form-field"><label>Email</label><input type="email" id="bkEmail"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-field"><label>Phone</label><input type="tel" id="bkPhone" placeholder="+91"></div>
+            <div class="form-field"><label>Date of Birth</label><input type="date" id="bkDob"></div>
+          </div>
+        </div>
+        <div class="form-section">
+          <h3><span class="step-badge">2</span> Trip Details</h3>
+          <div class="form-row">
+            <div class="form-field"><label>Travel Date</label><input type="date" id="bkDate"></div>
+            <div class="form-field"><label>No. of Travelers</label><input type="number" id="bkTravelers" min="1" max="20" value="1" onchange="updateBookingTotal()"></div>
+          </div>
+          <div class="form-field full"><label>Special Requests</label><textarea id="bkRequests" rows="3" placeholder="Any dietary requirements, room preferences..."></textarea></div>
+        </div>
+        <div class="form-section">
+          <h3><span class="step-badge">3</span> Add-ons</h3>
+          <div class="addons-grid">
+            <label class="addon-item"><input type="checkbox" value="1500" onchange="updateBookingTotal()"> <i class="fas fa-car"></i> Airport Transfer <strong>+₹1,500</strong></label>
+            <label class="addon-item"><input type="checkbox" value="2000" onchange="updateBookingTotal()"> <i class="fas fa-shield-alt"></i> Travel Insurance <strong>+₹2,000</strong></label>
+            <label class="addon-item"><input type="checkbox" value="3000" onchange="updateBookingTotal()"> <i class="fas fa-camera"></i> Photography Tour <strong>+₹3,000</strong></label>
+            <label class="addon-item"><input type="checkbox" value="1000" onchange="updateBookingTotal()"> <i class="fas fa-utensils"></i> Meal Upgrades <strong>+₹1,000</strong></label>
+          </div>
+        </div>
+      </div>
+      <div class="booking-summary" id="bookingSummary"></div>
+    </div>
+    <div class="booking-actions">
+      <button class="btn-outline large" onclick="showPage('packages')">← Back</button>
+      <button class="btn-primary large" onclick="proceedToPayment()">Proceed to Payment →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ PAYMENT PAGE ══════════════════ -->
+<div id="paymentPage" class="page">
+  <div class="payment-container">
+    <h1 class="booking-title"><i class="fas fa-lock"></i> Secure Payment</h1>
+    <div class="payment-layout">
+      <div class="payment-form-wrap">
+        <div class="form-section">
+          <h3>Payment Method</h3>
+          <div class="payment-methods">
+            <label class="pay-method active" id="pm-card" onclick="selectPayment('card')">
+              <input type="radio" name="payment" value="card" checked>
+              <i class="fas fa-credit-card"></i> Credit / Debit Card
+            </label>
+            <label class="pay-method" id="pm-upi" onclick="selectPayment('upi')">
+              <input type="radio" name="payment" value="upi">
+              <i class="fas fa-mobile-alt"></i> UPI
+            </label>
+            <label class="pay-method" id="pm-netbanking" onclick="selectPayment('netbanking')">
+              <input type="radio" name="payment" value="netbanking">
+              <i class="fas fa-university"></i> Net Banking
+            </label>
+          </div>
+        </div>
+        <div id="cardForm" class="form-section">
+          <h3>Card Details</h3>
+          <div class="form-field full"><label>Cardholder Name</label><input type="text" id="cardName" placeholder="Name on card"></div>
+          <div class="form-field full"><label>Card Number</label><input type="text" id="cardNum" placeholder="1234 5678 9012 3456" maxlength="19" oninput="formatCard(this)"></div>
+          <div class="form-row">
+            <div class="form-field"><label>Expiry</label><input type="text" placeholder="MM/YY" maxlength="5"></div>
+            <div class="form-field"><label>CVV</label><input type="password" placeholder="•••" maxlength="3"></div>
+          </div>
+        </div>
+        <div id="upiForm" class="form-section hidden">
+          <h3>UPI Payment</h3>
+          <div class="form-field full"><label>UPI ID</label><input type="text" placeholder="yourname@upi"></div>
+          <div class="upi-apps">
+            <div class="upi-app"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/f2/Google_Pay_Logo.svg/512px-Google_Pay_Logo.svg.png" alt="GPay"><span>GPay</span></div>
+            <div class="upi-app"><img src="https://upload.wikimedia.org/wikipedia/commons/2/24/Paytm_Logo_%28standalone%29.svg" alt="Paytm"><span>Paytm</span></div>
+            <div class="upi-app"><img src="https://upload.wikimedia.org/wikipedia/commons/thumb/7/71/PhonePe_Logo.svg/512px-PhonePe_Logo.svg.png" alt="PhonePe"><span>PhonePe</span></div>
+          </div>
+        </div>
+        <div id="netForm" class="form-section hidden">
+          <h3>Net Banking</h3>
+          <div class="form-field full"><label>Select Bank</label>
+            <select><option>State Bank of India</option><option>HDFC Bank</option><option>ICICI Bank</option><option>Axis Bank</option><option>Kotak Bank</option></select>
+          </div>
+        </div>
+        <div class="form-section">
+          <label class="addon-item"><input type="checkbox" id="termsCheck"> I agree to the <a href="#">Terms & Conditions</a> and <a href="#">Cancellation Policy</a></label>
+        </div>
+      </div>
+      <div class="booking-summary" id="paymentSummary"></div>
+    </div>
+    <div class="booking-actions">
+      <button class="btn-outline large" onclick="showPage('booking')">← Back</button>
+      <button class="btn-primary large" onclick="processPayment()"><i class="fas fa-lock"></i> Pay Now</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ BILL / CONFIRMATION PAGE ══════════════════ -->
+<div id="billPage" class="page">
+  <div class="bill-container" id="billContent"></div>
+</div>
+
+<!-- ══════════════════ MY BOOKINGS PAGE ══════════════════ -->
+<div id="mybookingsPage" class="page">
+  <div class="booking-container">
+    <h1 class="booking-title"><i class="fas fa-suitcase-rolling"></i> My Trips</h1>
+    <div id="myBookingsList"></div>
+  </div>
+</div>
+
+<!-- ══════════════════ FOOTER ══════════════════ -->
+<footer class="footer">
+  <div class="footer-grid">
+    <div>
+      <div class="footer-brand"><i class="fas fa-globe-asia"></i> WanderLux</div>
+      <p>Creating unforgettable travel memories since 2015. Your journey is our passion.</p>
+      <div class="social-links">
+        <a href="#"><i class="fab fa-instagram"></i></a>
+        <a href="#"><i class="fab fa-facebook"></i></a>
+        <a href="#"><i class="fab fa-twitter"></i></a>
+        <a href="#"><i class="fab fa-youtube"></i></a>
+      </div>
+    </div>
+    <div>
+      <h4>Destinations</h4>
+      <ul><li>Maldives</li><li>Bali</li><li>Switzerland</li><li>Santorini</li><li>Himalayas</li></ul>
+    </div>
+    <div>
+      <h4>Quick Links</h4>
+      <ul><li>About Us</li><li>Blog</li><li>Careers</li><li>Privacy Policy</li><li>Refund Policy</li></ul>
+    </div>
+    <div>
+      <h4>Newsletter</h4>
+      <p>Get exclusive deals in your inbox</p>
+      <div class="newsletter"><input type="email" placeholder="Your email"><button>Subscribe</button></div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2025 WanderLux. All rights reserved. | Designed with ❤️ for travelers</p>
+  </div>
+</footer>
+
+<!-- ══════════════════ LOGIN MODAL ══════════════════ -->
+<div class="modal-overlay" id="loginModal" onclick="closeModalOut(event,'loginModal')">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('loginModal')">✕</button>
+    <div class="modal-header">
+      <i class="fas fa-globe-asia modal-logo"></i>
+      <h2>Welcome Back</h2>
+      <p>Login to continue your adventure</p>
+    </div>
+    <div class="social-auth">
+      <button class="social-btn google"><i class="fab fa-google"></i> Continue with Google</button>
+    </div>
+    <div class="divider"><span>or</span></div>
+    <div class="form-field"><label>Email</label><input type="email" id="loginEmail" placeholder="you@example.com"></div>
+    <div class="form-field"><label>Password</label><input type="password" id="loginPass" placeholder="••••••••"><a href="#" class="forgot">Forgot password?</a></div>
+    <button class="btn-primary full" onclick="login()">Login</button>
+    <p class="modal-switch">New here? <a href="#" onclick="switchModal('loginModal','signupModal')">Create account →</a></p>
+    <div id="loginError" class="auth-error hidden"></div>
+  </div>
+</div>
+
+<!-- ══════════════════ SIGNUP MODAL ══════════════════ -->
+<div class="modal-overlay" id="signupModal" onclick="closeModalOut(event,'signupModal')">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal('signupModal')">✕</button>
+    <div class="modal-header">
+      <i class="fas fa-globe-asia modal-logo"></i>
+      <h2>Join WanderLux</h2>
+      <p>Start your journey today</p>
+    </div>
+    <div class="social-auth">
+      <button class="social-btn google"><i class="fab fa-google"></i> Sign up with Google</button>
+    </div>
+    <div class="divider"><span>or</span></div>
+    <div class="form-field"><label>Full Name</label><input type="text" id="signupName" placeholder="Your full name"></div>
+    <div class="form-field"><label>Email</label><input type="email" id="signupEmail" placeholder="you@example.com"></div>
+    <div class="form-field"><label>Phone</label><input type="tel" id="signupPhone" placeholder="+91 98765 43210"></div>
+    <div class="form-field"><label>Password</label><input type="password" id="signupPass" placeholder="Min 6 characters"></div>
+    <button class="btn-primary full" onclick="signup()">Create Account</button>
+    <p class="modal-switch">Already have an account? <a href="#" onclick="switchModal('signupModal','loginModal')">Login →</a></p>
+    <div id="signupError" class="auth-error hidden"></div>
+  </div>
+</div>
+
+<!-- ══════════════════ LOADING OVERLAY ══════════════════ -->
+<div class="loading-overlay hidden" id="loadingOverlay">
+  <div class="loader">
+    <i class="fas fa-globe-asia fa-spin"></i>
+    <p id="loadingMsg">Processing...</p>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>

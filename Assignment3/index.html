@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kala's Fashion Hub | Rental Marketplace</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&family=Playfair+Display:wght@600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Global alert area -->
+  <div id="statusAlertContainer" class="status-alert-wrap"></div>
+
+  <!-- Top info strip -->
+  <div class="top-strip text-center text-lg-start">
+    <div class="container d-lg-flex justify-content-between">
+      <span>Free delivery in Pune on rentals above Rs 1499</span>
+      <span>Trusted by 10,000+ fashion renters</span>
+    </div>
+  </div>
+
+  <!-- Stylish Bootstrap navbar -->
+  <nav class="navbar navbar-expand-lg main-navbar sticky-top">
+    <div class="container">
+      <a class="navbar-brand" href="#home">
+        <span class="brand-title">Kala's Fashion Hub</span>
+        <small class="brand-sub">Rent Dresses, Footwear & Jewelry</small>
+      </a>
+
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNav" aria-controls="mainNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="mainNav">
+        <ul class="navbar-nav ms-auto me-lg-3 align-items-lg-center gap-lg-2">
+          <li class="nav-item"><a class="nav-link" href="#featured">Featured</a></li>
+          <li class="nav-item"><a class="nav-link" href="#productsSection">Products</a></li>
+
+          <!-- Bootstrap dropdown -->
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Collections</a>
+            <ul class="dropdown-menu shadow-sm">
+              <li><button class="dropdown-item" type="button" onclick="quickFilter('Women','Dress')">Women's Dresses</button></li>
+              <li><button class="dropdown-item" type="button" onclick="quickFilter('Men','Dress')">Men Ethnic Wear</button></li>
+              <li><button class="dropdown-item" type="button" onclick="quickFilter('All','Footwear')">Footwear Rentals</button></li>
+              <li><button class="dropdown-item" type="button" onclick="quickFilter('All','Jewelry')">Jewelry Rentals</button></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><button class="dropdown-item" type="button" onclick="quickFilter('All','All')">View All</button></li>
+            </ul>
+          </li>
+        </ul>
+
+        <div class="d-flex flex-column flex-lg-row gap-2 align-items-stretch align-items-lg-center">
+          <input id="searchInput" class="form-control search-input" type="text" placeholder="Search dresses, sherwani, heels, kundan...">
+          <button id="profileBtn" class="btn profile-btn" type="button" onclick="handleProfileAction()" aria-label="Profile">
+            <span class="profile-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none">
+                <path d="M12 12.8c2.65 0 4.8-2.15 4.8-4.8S14.65 3.2 12 3.2 7.2 5.35 7.2 8s2.15 4.8 4.8 4.8Zm0 2.4c-3.74 0-7.2 1.88-7.2 4.2V21h14.4v-1.6c0-2.32-3.46-4.2-7.2-4.2Z" fill="currentColor"/>
+              </svg>
+            </span>
+            <span id="profileBtnText">Sign In</span>
+          </button>
+          <button class="btn cart-btn" type="button" onclick="openCart()">
+            Cart <span id="cartCount" class="badge cart-count">0</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero carousel -->
+  <header id="home" class="container py-4">
+    <div id="heroCarousel" class="carousel slide carousel-fade hero-carousel" data-bs-ride="carousel" data-bs-interval="4000">
+      <div class="carousel-indicators">
+        <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+        <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
+        <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
+      </div>
+
+      <div class="carousel-inner rounded-4 overflow-hidden">
+        <div class="carousel-item active">
+          <div class="hero-collage" aria-label="Wedding fashion collage">
+            <img src="https://static.wixstatic.com/media/cc1936_9ffe3767f76a4d179f0c118f2bf0bc83~mv2.jpg/v1/fill/w_280,h_414,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/marathi-wedding-photography.jpg" alt="Wedding look A">
+            <img src="https://cdn.shopify.com/s/files/1/0583/3221/7421/files/Nick-Jonas_480x480.jpg?v=1711438146" alt="Wedding look B">
+            <img src="https://d3pc1xvrcw35tl.cloudfront.net/images/665x504/iampoojasawant-1709187752-3313229467994520884-1489055754_2024021185605.jpg" alt="Wedding look C">
+          </div>
+          <div class="carousel-caption text-start">
+            <p class="hero-kicker">Wedding Edit</p>
+            <h1>Own The Celebration Look</h1>
+            <p>Designer lehengas, sherwanis, accessories and footwear on rent.</p>
+            <a href="#productsSection" class="btn hero-cta">Explore Rentals</a>
+          </div>
+        </div>
+
+        <div class="carousel-item">
+          <img src="https://images.unsplash.com/photo-1612423284934-2850a4ea6b0f?auto=format&fit=crop&w=1600&q=80" class="d-block w-100 hero-image" alt="Luxury dresses collection">
+          <div class="carousel-caption text-start">
+            <p class="hero-kicker">Luxury Styles</p>
+            <h2>From Festive To Cocktail</h2>
+            <p>Curated looks for women, men and kids with same-day delivery options.</p>
+            <a href="#featured" class="btn hero-cta">See Featured</a>
+          </div>
+        </div>
+
+        <div class="carousel-item">
+          <div class="hero-collage" aria-label="Jewelry and accessories rental images">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQaLWkndZTc5LQ1XONrlypCoCy1MWMUlpHusg&s" alt="Wedding look 1">
+            <img src="https://i.pinimg.com/736x/c1/42/8f/c1428f91acbcc662520fa4eb4ef6c0e8.jpg" alt="Wedding look 2">
+            <img src="https://cloudfront-eu-central-1.images.arcpublishing.com/thenational/BTTNJMG23RHNLNHOO3CNE6FMRI.jpeg" alt="Wedding look 3">
+          </div>
+          <div class="carousel-caption text-start">
+            <p class="hero-kicker">Jewelry + Footwear</p>
+            <h2>Complete Your Outfit In One Place</h2>
+            <p>Rent statement jewelry and footwear that match your event vibe.</p>
+            <a href="#productsSection" class="btn hero-cta">Shop Collection</a>
+          </div>
+        </div>
+      </div>
+
+      <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Previous</span>
+      </button>
+      <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+        <span class="visually-hidden">Next</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Featured collections -->
+  <section id="featured" class="container pb-3">
+    <div class="section-head d-flex justify-content-between align-items-center mb-3">
+      <h3 class="section-title mb-0">Featured Collections</h3>
+      <span class="badge text-bg-dark px-3 py-2">New Season</span>
+    </div>
+
+    <div class="row g-3 featured-grid">
+      <div class="col-md-4">
+        <article class="featured-card">
+          <h4>Bridal Edit</h4>
+          <p>Lehengas, sarees and jewelry sets for wedding functions.</p>
+          <button class="btn btn-sm btn-outline-dark" onclick="quickFilter('Women','Dress')">Explore</button>
+        </article>
+      </div>
+      <div class="col-md-4">
+        <article class="featured-card">
+          <h4>Groom Collection</h4>
+          <p>Sherwani, bandhgala and mojaris for men and boys.</p>
+          <button class="btn btn-sm btn-outline-dark" onclick="quickFilter('Men','Dress')">Explore</button>
+        </article>
+      </div>
+      <div class="col-md-4">
+        <article class="featured-card">
+          <h4>Accessories Studio</h4>
+          <p>Kundan, temple jewelry, heels and occasion footwear.</p>
+          <button class="btn btn-sm btn-outline-dark" onclick="quickFilter('All','Jewelry')">Explore</button>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- Product controls -->
+  <section class="container py-3" id="productsSection">
+    <div class="controls-panel">
+      <div class="d-flex flex-wrap gap-2 align-items-center justify-content-between">
+        <h3 class="section-title mb-0">Trending Rental Collection</h3>
+        <p id="resultCount" class="result-count mb-0">0 items</p>
+      </div>
+
+      <div class="d-flex flex-wrap gap-3 mt-3 align-items-center justify-content-between">
+        <!-- Bootstrap button group -->
+        <div class="btn-group audience-group" role="group" aria-label="Audience filters">
+          <button type="button" class="btn btn-outline-dark audience-btn active" onclick="filterCategory('All', this)">All</button>
+          <button type="button" class="btn btn-outline-dark audience-btn" onclick="filterCategory('Women', this)">Women</button>
+          <button type="button" class="btn btn-outline-dark audience-btn" onclick="filterCategory('Men', this)">Men</button>
+          <button type="button" class="btn btn-outline-dark audience-btn" onclick="filterCategory('Kids', this)">Kids</button>
+        </div>
+
+        <div class="d-flex flex-wrap gap-2">
+          <!-- Bootstrap dropdown for type -->
+          <div class="dropdown">
+            <button class="btn btn-outline-dark dropdown-toggle" type="button" id="typeDropdownBtn" data-bs-toggle="dropdown" aria-expanded="false">
+              Type: All
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><button class="dropdown-item" type="button" onclick="setTypeFromMenu('All', 'All')">All</button></li>
+              <li><button class="dropdown-item" type="button" onclick="setTypeFromMenu('Dress', 'Dresses')">Dresses</button></li>
+              <li><button class="dropdown-item" type="button" onclick="setTypeFromMenu('Footwear', 'Footwear')">Footwear</button></li>
+              <li><button class="dropdown-item" type="button" onclick="setTypeFromMenu('Jewelry', 'Jewelry')">Jewelry</button></li>
+            </ul>
+          </div>
+
+          <!-- Bootstrap dropdown for sort -->
+          <div class="dropdown">
+            <button class="btn btn-outline-dark dropdown-toggle" type="button" id="sortDropdownBtn" data-bs-toggle="dropdown" aria-expanded="false">
+              Sort: Popular
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+              <li><button class="dropdown-item" type="button" onclick="setSortFromMenu('popular', 'Popular')">Most Popular</button></li>
+              <li><button class="dropdown-item" type="button" onclick="setSortFromMenu('priceLow', 'Low to High')">Price: Low to High</button></li>
+              <li><button class="dropdown-item" type="button" onclick="setSortFromMenu('priceHigh', 'High to Low')">Price: High to Low</button></li>
+              <li><button class="dropdown-item" type="button" onclick="setSortFromMenu('nameAZ', 'A to Z')">Name: A to Z</button></li>
+            </ul>
+          </div>
+
+          <button type="button" class="btn btn-dark" onclick="resetFilters()">Reset</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Product cards -->
+  <main class="container pb-4">
+    <div class="row g-4" id="productContainer"></div>
+  </main>
+
+  <!-- Auth modal -->
+  <div class="modal fade" id="authModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content auth-modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="authModalTitle">Sign In</h5>
+          <button class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="authForm" class="auth-form">
+            <div id="authNameWrap" class="mb-2 d-none">
+              <label for="authName" class="form-label">Full Name</label>
+              <input type="text" id="authName" class="form-control" placeholder="Enter your name">
+            </div>
+            <div class="mb-2">
+              <label for="authEmail" class="form-label">Email</label>
+              <input type="email" id="authEmail" class="form-control" placeholder="Enter your email" required>
+            </div>
+            <div class="mb-2">
+              <label for="authPassword" class="form-label">Password</label>
+              <input type="password" id="authPassword" class="form-control" placeholder="Enter your password" required minlength="6">
+            </div>
+            <button id="authSubmitBtn" type="submit" class="btn auth-submit-btn mt-2">Sign In</button>
+          </form>
+          <p class="auth-switch-text mb-0 mt-3">
+            <span id="authSwitchLabel">New here?</span>
+            <button id="authSwitchBtn" class="btn btn-link p-0 auth-switch-btn" type="button" onclick="toggleAuthMode()">Create account</button>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Rent modal -->
+  <div class="modal fade" id="rentModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Confirm Rental</h5>
+          <button class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body rent-modal-body">
+          <div class="rent-image-wrap">
+            <img id="rentImage" src="" alt="Selected rental item">
+          </div>
+          <div class="rent-form-wrap">
+            <h4 id="rentName"></h4>
+            <p class="rent-meta"><span id="rentType"></span> | Rs <span id="rentPrice"></span> / day</p>
+
+            <div class="row g-2">
+              <div class="col-md-6">
+                <label for="fromDate" class="form-label">From Date</label>
+                <input type="date" id="fromDate" class="form-control">
+              </div>
+              <div class="col-md-6">
+                <label for="toDate" class="form-label">To Date</label>
+                <input type="date" id="toDate" class="form-control">
+              </div>
+            </div>
+
+            <div class="row g-2 mt-1">
+              <div class="col-md-6">
+                <label for="size" class="form-label">Size</label>
+                <select id="size" class="form-select"></select>
+              </div>
+              <div class="col-md-6">
+                <label for="quantity" class="form-label">Quantity</label>
+                <input type="number" id="quantity" class="form-control" min="1" value="1">
+              </div>
+            </div>
+
+            <p class="rent-total">Total: Rs <span id="totalAmount">0</span></p>
+            <button id="confirmBtn" class="btn confirm-btn" type="button">Add to Cart</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Cart modal -->
+  <div class="modal fade" id="cartModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Your Rental Cart</h5>
+          <button class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div id="cartItems"></div>
+          <hr>
+          <div class="d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Total Payable</h5>
+            <h5 class="mb-0">Rs <span id="cartTotal">0</span></h5>
+          </div>
+          <button class="btn checkout-btn mt-3" onclick="payNow()">Proceed to Checkout</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="container">
+      <p>Kala's Fashion Hub | Rental Marketplace | Pune, Maharashtra</p>
+      <p>Email: kalasfashionhub@gmail.com | Phone: +91-98765-12345</p>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

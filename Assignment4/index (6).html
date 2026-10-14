@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Student Academic Performance Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+  :root {
+    --bg-grad-start: #0f2027;
+    --bg-grad-mid:   #203a43;
+    --bg-grad-end:   #2c5364;
+    --card-bg:       #ffffff;
+    --primary:       #3a86ff;
+    --secondary:     #8338ec;
+    --attend-color:  #06d6a0;
+    --progress-color:#ffbe0b;
+    --radar-color:   #fb5607;
+    --gpa-color:     #ef476f;
+    --text-dark:     #0f2027;
+    --text-body:     #333;
+    --text-muted:    #6c7a8a;
+    --shadow:        0 10px 25px rgba(0,0,0,0.1);
+    --shadow-lg:     0 20px 50px rgba(0,0,0,0.18);
+    --radius:        14px;
+    --transition:    0.35s cubic-bezier(0.4,0,0.2,1);
+  }
+  [data-theme="dark"] {
+    --card-bg:   #1a2f3a;
+    --text-body: #cdd8e0;
+    --text-dark: #e8f0f5;
+    --text-muted:#7a99aa;
+    --shadow:    0 10px 25px rgba(0,0,0,0.4);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: linear-gradient(135deg, var(--bg-grad-start), var(--bg-grad-mid), var(--bg-grad-end));
+    min-height: 100vh;
+    color: var(--text-body);
+    transition: background var(--transition);
+  }
+
+  /* LOADER */
+  #loader {
+    position: fixed; inset: 0; z-index: 9999;
+    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 20px; transition: opacity 0.5s, visibility 0.5s;
+  }
+  #loader.hidden { opacity: 0; visibility: hidden; }
+  .spinner {
+    width: 56px; height: 56px;
+    border: 5px solid rgba(255,255,255,0.15);
+    border-top-color: var(--primary);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+  .loader-text { color: #fff; font-family: 'Syne', sans-serif; font-size: 1rem; letter-spacing: 3px; text-transform: uppercase; opacity: 0.7; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* WRAPPER */
+  .wrapper {
+    max-width: 1380px; margin: 0 auto; padding: 0 24px 60px;
+    opacity: 0; transform: translateY(20px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+  .wrapper.visible { opacity: 1; transform: none; }
+
+  /* HEADER */
+  header {
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 20px; padding: 36px 0 28px;
+  }
+  .header-brand { display: flex; align-items: center; gap: 14px; }
+  .brand-icon {
+    width: 52px; height: 52px; border-radius: 14px;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.4rem; box-shadow: 0 8px 20px rgba(58,134,255,0.4); flex-shrink: 0;
+  }
+  .brand-text h1 { font-family: 'Syne', sans-serif; font-size: 1.55rem; font-weight: 800; color: #fff; line-height: 1.1; }
+  .brand-text p  { color: rgba(255,255,255,0.55); font-size: 0.82rem; letter-spacing: 1px; margin-top: 2px; }
+  .header-controls { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+
+  select {
+    appearance: none;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: #fff; padding: 10px 38px 10px 16px;
+    border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 0.88rem;
+    cursor: pointer; backdrop-filter: blur(10px);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='white' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 14px center;
+    transition: var(--transition);
+  }
+  select:hover { background-color: rgba(255,255,255,0.18); }
+  select option { background: #203a43; color: #fff; }
+
+  .btn {
+    padding: 10px 20px; border-radius: 10px; border: none;
+    font-family: 'DM Sans', sans-serif; font-size: 0.88rem;
+    cursor: pointer; font-weight: 500;
+    display: flex; align-items: center; gap: 8px;
+    transition: var(--transition);
+  }
+  .btn-ghost {
+    background: rgba(255,255,255,0.1); color: #fff;
+    border: 1px solid rgba(255,255,255,0.2); backdrop-filter: blur(10px);
+  }
+  .btn-ghost:hover { background: rgba(255,255,255,0.2); transform: translateY(-1px); }
+  .btn-primary {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: #fff; box-shadow: 0 6px 20px rgba(58,134,255,0.35);
+  }
+  .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(58,134,255,0.45); }
+
+  /* SECTION TITLE */
+  .section-title {
+    font-family: 'Syne', sans-serif; font-size: 1.1rem; font-weight: 700;
+    color: #fff; margin-bottom: 18px; display: flex; align-items: center; gap: 10px;
+  }
+  .section-title::after { content: ''; flex: 1; height: 1px; background: rgba(255,255,255,0.15); }
+
+  /* CARDS */
+  .cards-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 20px; margin-bottom: 28px; }
+  .card {
+    background: var(--card-bg); border-radius: var(--radius);
+    box-shadow: var(--shadow); padding: 26px 24px;
+    position: relative; overflow: hidden;
+    transition: transform var(--transition), box-shadow var(--transition), background var(--transition);
+    animation: cardIn 0.5s ease both;
+  }
+  .card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+  @keyframes cardIn { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:none; } }
+  .card-accent { position: absolute; top:0; right:0; width:90px; height:90px; border-radius: 0 var(--radius) 0 100%; opacity: 0.12; }
+  .card-icon { width:46px; height:46px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:1.3rem; margin-bottom:16px; }
+  .card-label { font-size:0.78rem; font-weight:500; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:6px; }
+  .card-value { font-family:'Syne',sans-serif; font-size:2rem; font-weight:800; color:var(--text-dark); line-height:1; }
+  .card-sub   { font-size:0.78rem; color:var(--text-muted); margin-top:6px; }
+  .card-badge { display:inline-block; padding:3px 10px; border-radius:30px; font-size:0.72rem; font-weight:600; margin-top:8px; }
+
+  /* CHARTS */
+  .charts-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:22px; margin-bottom:28px; }
+  .chart-card {
+    background: var(--card-bg); border-radius: var(--radius); box-shadow: var(--shadow); padding: 26px;
+    transition: background var(--transition), box-shadow var(--transition), transform var(--transition);
+    animation: cardIn 0.55s ease both;
+  }
+  .chart-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
+  .chart-header { display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:20px; }
+  .chart-title    { font-family:'Syne',sans-serif; font-size:1rem; font-weight:700; color:var(--text-dark); }
+  .chart-subtitle { font-size:0.78rem; color:var(--text-muted); margin-top:3px; }
+  .chart-tag      { font-size:0.7rem; font-weight:600; padding:4px 12px; border-radius:20px; background:rgba(58,134,255,0.1); color:var(--primary); }
+  .chart-wrap    { position:relative; height:240px; }
+  .chart-wrap-sm { position:relative; height:220px; }
+
+  /* BOTTOM */
+  .bottom-grid { display:grid; grid-template-columns:1.2fr 0.8fr; gap:22px; margin-bottom:28px; }
+
+  /* PROGRESS */
+  .progress-list { display:flex; flex-direction:column; gap:18px; }
+  .progress-meta { display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
+  .progress-label { font-size:0.88rem; font-weight:500; color:var(--text-dark); }
+  .progress-pct   { font-family:'Syne',sans-serif; font-size:0.95rem; font-weight:700; }
+  .progress-track { height:9px; border-radius:30px; background:rgba(0,0,0,0.07); overflow:hidden; }
+  [data-theme="dark"] .progress-track { background:rgba(255,255,255,0.08); }
+  .progress-fill  { height:100%; border-radius:30px; transition: width 1.2s cubic-bezier(0.4,0,0.2,1); width:0; }
+
+  /* TABLE */
+  .table-wrap { overflow-x:auto; }
+  table { width:100%; border-collapse:collapse; font-size:0.85rem; }
+  thead { background: linear-gradient(90deg, var(--primary), var(--secondary)); }
+  thead th { padding:13px 16px; text-align:left; color:#fff; font-family:'Syne',sans-serif; font-weight:600; font-size:0.8rem; text-transform:uppercase; letter-spacing:0.5px; }
+  thead th:first-child { border-radius:10px 0 0 10px; }
+  thead th:last-child  { border-radius:0 10px 10px 0; }
+  tbody tr { border-bottom:1px solid rgba(0,0,0,0.06); transition:background var(--transition); }
+  [data-theme="dark"] tbody tr { border-color:rgba(255,255,255,0.06); }
+  tbody tr:hover { background:rgba(58,134,255,0.06); }
+  tbody td { padding:12px 16px; color:var(--text-body); }
+  .grade-pill { display:inline-block; padding:3px 12px; border-radius:20px; font-size:0.78rem; font-weight:700; }
+
+  /* GPA RING */
+  .gpa-display { text-align:center; padding:10px 0 20px; }
+  .gpa-ring    { position:relative; display:inline-flex; align-items:center; justify-content:center; }
+  .gpa-svg     { width:160px; height:160px; transform:rotate(-90deg); }
+  .gpa-bg      { fill:none; stroke:rgba(0,0,0,0.08); stroke-width:12; }
+  [data-theme="dark"] .gpa-bg { stroke:rgba(255,255,255,0.08); }
+  .gpa-fill    { fill:none; stroke-width:12; stroke-linecap:round; transition:stroke-dashoffset 1.4s cubic-bezier(0.4,0,0.2,1); }
+  .gpa-center  { position:absolute; text-align:center; }
+  .gpa-num     { font-family:'Syne',sans-serif; font-size:2.2rem; font-weight:800; color:var(--text-dark); display:block; }
+  .gpa-lbl     { font-size:0.72rem; color:var(--text-muted); letter-spacing:1px; text-transform:uppercase; }
+  .gpa-grade-badge { display:inline-block; margin-top:16px; padding:6px 24px; border-radius:30px; font-size:0.9rem; font-weight:700; font-family:'Syne',sans-serif; letter-spacing:1px; }
+
+  /* FOOTER */
+  footer { text-align:center; padding:24px 0; color:rgba(255,255,255,0.35); font-size:0.8rem; }
+
+  /* DARK TEXT FIXES */
+  [data-theme="dark"] .chart-title,
+  [data-theme="dark"] .card-value,
+  [data-theme="dark"] .progress-label,
+  [data-theme="dark"] tbody td { color: var(--text-dark); }
+
+  /* RESPONSIVE */
+  @media (max-width: 1100px) {
+    .cards-grid  { grid-template-columns: repeat(2,1fr); }
+    .charts-grid { grid-template-columns: 1fr; }
+    .bottom-grid { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 600px) {
+    .cards-grid { grid-template-columns: 1fr; }
+    header { flex-direction: column; align-items: flex-start; }
+    .header-controls { width: 100%; }
+    select, .btn { flex: 1; }
+    .brand-text h1 { font-size: 1.2rem; }
+  }
+
+  /* Stagger delays */
+  .card:nth-child(1) { animation-delay: 0.05s; }
+  .card:nth-child(2) { animation-delay: 0.12s; }
+  .card:nth-child(3) { animation-delay: 0.19s; }
+  .card:nth-child(4) { animation-delay: 0.26s; }
+  .chart-card:nth-child(1) { animation-delay: 0.08s; }
+  .chart-card:nth-child(2) { animation-delay: 0.16s; }
+  .chart-card:nth-child(3) { animation-delay: 0.24s; }
+  .chart-card:nth-child(4) { animation-delay: 0.32s; }
+</style>
+</head>
+<body>
+
+<div id="loader">
+  <div class="spinner"></div>
+  <div class="loader-text">Loading Dashboard</div>
+</div>
+
+<div class="wrapper" id="mainWrapper">
+  <header>
+    <div class="header-brand">
+      <div class="brand-icon">🎓</div>
+      <div class="brand-text">
+        <h1>AcademiX Dashboard</h1>
+        <p>STUDENT PERFORMANCE ANALYTICS</p>
+      </div>
+    </div>
+    <div class="header-controls">
+      <select id="studentSelect" onchange="updateDashboard()">
+        <option value="0">👤 Aryan Sharma</option>
+        <option value="1">👤 Priya Patel</option>
+        <option value="2">👤 Rohan Mehta</option>
+        <option value="3">👤 Sneha Iyer</option>
+      </select>
+      <select id="semesterSelect" onchange="updateDashboard()">
+        <option value="0">Semester 1</option>
+        <option value="1">Semester 2</option>
+        <option value="2">Semester 3</option>
+        <option value="3">Semester 4</option>
+      </select>
+      <button class="btn btn-ghost" onclick="toggleDark()">🌙 Dark Mode</button>
+      <button class="btn btn-primary" onclick="downloadPDF()">⬇ PDF Report</button>
+    </div>
+  </header>
+
+  <div class="section-title">📋 Student Overview</div>
+  <div class="cards-grid">
+    <div class="card">
+      <div class="card-accent" style="background:var(--primary)"></div>
+      <div class="card-icon" style="background:rgba(58,134,255,0.12)">🎓</div>
+      <div class="card-label">Student Name</div>
+      <div class="card-value" id="cardName" style="font-size:1.3rem;margin-top:4px">—</div>
+      <div class="card-sub" id="cardRoll">Roll No: —</div>
+    </div>
+    <div class="card">
+      <div class="card-accent" style="background:var(--gpa-color)"></div>
+      <div class="card-icon" style="background:rgba(239,71,111,0.12)">📊</div>
+      <div class="card-label">Overall GPA</div>
+      <div class="card-value" id="cardGPA" style="color:var(--gpa-color)">—</div>
+      <div id="cardGPAbadge" class="card-badge"></div>
+    </div>
+    <div class="card">
+      <div class="card-accent" style="background:var(--attend-color)"></div>
+      <div class="card-icon" style="background:rgba(6,214,160,0.12)">📅</div>
+      <div class="card-label">Attendance</div>
+      <div class="card-value" id="cardAttend" style="color:var(--attend-color)">—</div>
+      <div class="card-sub">Current Semester</div>
+    </div>
+    <div class="card">
+      <div class="card-accent" style="background:var(--progress-color)"></div>
+      <div class="card-icon" style="background:rgba(255,190,11,0.12)">📘</div>
+      <div class="card-label">Avg Marks</div>
+      <div class="card-value" id="cardAvgMarks" style="color:var(--progress-color)">—</div>
+      <div class="card-sub">Out of 100</div>
+    </div>
+  </div>
+
+  <div class="section-title">📊 Performance Charts</div>
+  <div class="charts-grid">
+    <div class="chart-card">
+      <div class="chart-header">
+        <div><div class="chart-title">Subject-wise Total Marks</div><div class="chart-subtitle">Internal + External combined scores</div></div>
+        <div class="chart-tag">Bar Chart</div>
+      </div>
+      <div class="chart-wrap"><canvas id="barChart"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-header">
+        <div><div class="chart-title">Academic Progress Over Semesters</div><div class="chart-subtitle">GPA trend across all semesters</div></div>
+        <div class="chart-tag">Line Chart</div>
+      </div>
+      <div class="chart-wrap"><canvas id="lineChart"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-header">
+        <div><div class="chart-title">Attendance Breakdown</div><div class="chart-subtitle">Present vs Absent percentage</div></div>
+        <div class="chart-tag">Doughnut</div>
+      </div>
+      <div class="chart-wrap-sm"><canvas id="doughnutChart"></canvas></div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-header">
+        <div><div class="chart-title">Skill Performance Radar</div><div class="chart-subtitle">Soft & technical skill assessment</div></div>
+        <div class="chart-tag">Radar</div>
+      </div>
+      <div class="chart-wrap-sm"><canvas id="radarChart"></canvas></div>
+    </div>
+  </div>
+
+  <div class="section-title">📌 Subject Details & Progress</div>
+  <div class="bottom-grid">
+    <div class="chart-card">
+      <div class="chart-header">
+        <div><div class="chart-title">Subject-wise Marks Breakdown</div><div class="chart-subtitle">Internal · External · Total · Grade</div></div>
+      </div>
+      <div class="table-wrap">
+        <table id="marksTable">
+          <thead><tr><th>Subject</th><th>Internal</th><th>External</th><th>Total</th><th>Grade</th></tr></thead>
+          <tbody id="marksTableBody"></tbody>
+        </table>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:22px;">
+      <div class="chart-card" style="flex:1;">
+        <div class="chart-header">
+          <div><div class="chart-title">Overall GPA</div><div class="chart-subtitle">Cumulative Grade Point Average</div></div>
+        </div>
+        <div class="gpa-display">
+          <div class="gpa-ring">
+            <svg class="gpa-svg" viewBox="0 0 160 160">
+              <circle class="gpa-bg" cx="80" cy="80" r="64"/>
+              <circle class="gpa-fill" id="gpaCircle" cx="80" cy="80" r="64"
+                stroke="url(#gpaGrad)" stroke-dasharray="402.12" stroke-dashoffset="402.12"/>
+              <defs>
+                <linearGradient id="gpaGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" style="stop-color:#ef476f"/>
+                  <stop offset="100%" style="stop-color:#8338ec"/>
+                </linearGradient>
+              </defs>
+            </svg>
+            <div class="gpa-center">
+              <span class="gpa-num" id="gpaNum">—</span>
+              <span class="gpa-lbl">/ 10.0</span>
+            </div>
+          </div>
+          <div><span class="gpa-grade-badge" id="gpaGradeBadge"></span></div>
+        </div>
+      </div>
+      <div class="chart-card" style="flex:1.4;">
+        <div class="chart-header">
+          <div><div class="chart-title">Assignment Completion</div><div class="chart-subtitle">Per-subject submission rate</div></div>
+        </div>
+        <div class="progress-list" id="progressList"></div>
+      </div>
+    </div>
+  </div>
+
+  <footer>AcademiX Dashboard &copy; 2026 &nbsp;·&nbsp; Built with Chart.js &nbsp;·&nbsp; All data is for demonstration purposes.</footer>
+</div>
+
+<script>
+/* ── MOCK DATA ── */
+const students = [
+  {
+    name:"Aryan Sharma", roll:"CS2021001", gpa:[7.8,8.1,8.4,8.9],
+    attendance:87, skills:[80,75,85,70,65],
+    subjects:[
+      {name:"Mathematics",     internal:38,external:56},
+      {name:"Physics",         internal:35,external:52},
+      {name:"Data Structures", internal:42,external:60},
+      {name:"OOP",             internal:40,external:55},
+      {name:"English",         internal:36,external:50},
+    ],
+    assignments:[88,75,92,80,70],
+  },
+  {
+    name:"Priya Patel", roll:"CS2021042", gpa:[8.5,8.8,9.1,9.3],
+    attendance:94, skills:[90,85,78,88,72],
+    subjects:[
+      {name:"Mathematics",     internal:44,external:62},
+      {name:"Physics",         internal:40,external:58},
+      {name:"Data Structures", internal:45,external:65},
+      {name:"OOP",             internal:43,external:61},
+      {name:"English",         internal:42,external:60},
+    ],
+    assignments:[95,88,97,90,85],
+  },
+  {
+    name:"Rohan Mehta", roll:"CS2021078", gpa:[6.9,7.2,7.5,7.8],
+    attendance:72, skills:[65,80,60,75,82],
+    subjects:[
+      {name:"Mathematics",     internal:30,external:44},
+      {name:"Physics",         internal:28,external:40},
+      {name:"Data Structures", internal:35,external:50},
+      {name:"OOP",             internal:32,external:46},
+      {name:"English",         internal:34,external:48},
+    ],
+    assignments:[70,65,78,60,72],
+  },
+  {
+    name:"Sneha Iyer", roll:"CS2021115", gpa:[9.0,9.2,9.5,9.7],
+    attendance:98, skills:[95,90,92,88,85],
+    subjects:[
+      {name:"Mathematics",     internal:48,external:68},
+      {name:"Physics",         internal:46,external:66},
+      {name:"Data Structures", internal:49,external:69},
+      {name:"OOP",             internal:47,external:67},
+      {name:"English",         internal:48,external:68},
+    ],
+    assignments:[98,95,99,96,97],
+  },
+];
+
+const semesterLabels = ["Sem 1","Sem 2","Sem 3","Sem 4"];
+const skillLabels    = ["Communication","Coding","Presentation","Teamwork","Leadership"];
+const progressColors = ["#3a86ff","#8338ec","#06d6a0","#ffbe0b","#fb5607"];
+
+function getGrade(pct) {
+  if (pct>=90) return {g:"O",  color:"#06d6a0",bg:"rgba(6,214,160,0.12)"};
+  if (pct>=80) return {g:"A+", color:"#3a86ff", bg:"rgba(58,134,255,0.12)"};
+  if (pct>=70) return {g:"A",  color:"#8338ec", bg:"rgba(131,56,236,0.12)"};
+  if (pct>=60) return {g:"B+", color:"#ffbe0b", bg:"rgba(255,190,11,0.12)"};
+  if (pct>=50) return {g:"B",  color:"#fb5607", bg:"rgba(251,86,7,0.12)"};
+  return              {g:"C",  color:"#ef476f", bg:"rgba(239,71,111,0.12)"};
+}
+function getGPALabel(gpa) {
+  if (gpa>=9.5) return {l:"Outstanding 🌟",color:"#06d6a0",bg:"rgba(6,214,160,0.15)"};
+  if (gpa>=8.5) return {l:"Excellent 🎯",  color:"#3a86ff", bg:"rgba(58,134,255,0.15)"};
+  if (gpa>=7.5) return {l:"Very Good 👍",  color:"#8338ec", bg:"rgba(131,56,236,0.15)"};
+  if (gpa>=6.5) return {l:"Good ✅",        color:"#ffbe0b", bg:"rgba(255,190,11,0.15)"};
+  return              {l:"Average 📈",     color:"#fb5607", bg:"rgba(251,86,7,0.15)"};
+}
+
+/* ── CHART INSTANCES ── */
+let barChart, lineChart, doughnutChart, radarChart;
+
+function createCharts() {
+  barChart = new Chart(document.getElementById("barChart"), {
+    type:"bar",
+    data:{labels:[],datasets:[]},
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{legend:{labels:{font:{family:"'DM Sans'",size:12},color:"#888"}},
+               tooltip:{callbacks:{label:ctx=>` ${ctx.dataset.label}: ${ctx.parsed.y}`}}},
+      scales:{
+        x:{grid:{display:false},ticks:{font:{family:"'DM Sans'"},color:"#888"}},
+        y:{beginAtZero:true,max:130,grid:{color:"rgba(0,0,0,0.06)"},ticks:{color:"#888"}},
+      },
+      animation:{duration:800,easing:"easeInOutQuart"},
+      borderRadius:8, borderSkipped:false,
+    }
+  });
+
+  lineChart = new Chart(document.getElementById("lineChart"), {
+    type:"line",
+    data:{labels:semesterLabels,datasets:[]},
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{legend:{labels:{font:{family:"'DM Sans'",size:12},color:"#888"}},
+               tooltip:{callbacks:{label:ctx=>` GPA: ${ctx.parsed.y}`}}},
+      scales:{
+        x:{grid:{display:false},ticks:{color:"#888"}},
+        y:{min:5,max:10,grid:{color:"rgba(0,0,0,0.06)"},ticks:{color:"#888"}},
+      },
+      animation:{duration:900,easing:"easeInOutQuart"},
+      elements:{line:{tension:0.45},point:{radius:6,hoverRadius:9}},
+    }
+  });
+
+  doughnutChart = new Chart(document.getElementById("doughnutChart"), {
+    type:"doughnut",
+    data:{labels:["Present","Absent"],datasets:[]},
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{
+        legend:{position:"bottom",labels:{padding:20,color:"#888",font:{family:"'DM Sans'"}}},
+        tooltip:{callbacks:{label:ctx=>` ${ctx.label}: ${ctx.parsed}%`}},
+      },
+      cutout:"72%",
+      animation:{animateRotate:true,duration:1000},
+    }
+  });
+
+  radarChart = new Chart(document.getElementById("radarChart"), {
+    type:"radar",
+    data:{labels:skillLabels,datasets:[]},
+    options:{
+      responsive:true, maintainAspectRatio:false,
+      plugins:{legend:{display:false}},
+      scales:{r:{
+        beginAtZero:true, max:100, min:0,
+        ticks:{display:false,stepSize:20},
+        pointLabels:{font:{size:11,family:"'DM Sans'"},color:"#888"},
+        grid:{color:"rgba(0,0,0,0.08)"},
+        angleLines:{color:"rgba(0,0,0,0.08)"},
+      }},
+      animation:{duration:900},
+    }
+  });
+}
+
+/* ── UPDATE DASHBOARD ── */
+function updateDashboard() {
+  const sIdx   = parseInt(document.getElementById("studentSelect").value);
+  const semIdx = parseInt(document.getElementById("semesterSelect").value);
+  const s      = students[sIdx];
+  const subs   = s.subjects;
+
+  // Summary cards
+  document.getElementById("cardName").textContent = s.name;
+  document.getElementById("cardRoll").textContent = "Roll No: " + s.roll;
+  const gpa = s.gpa[semIdx];
+  document.getElementById("cardGPA").textContent = gpa.toFixed(1);
+  const gpaLbl = getGPALabel(gpa);
+  const badge = document.getElementById("cardGPAbadge");
+  badge.textContent = gpaLbl.l;
+  badge.style.cssText = `background:${gpaLbl.bg};color:${gpaLbl.color};`;
+  document.getElementById("cardAttend").textContent = s.attendance + "%";
+  const avg = Math.round(subs.reduce((a,b)=>a+b.internal+b.external,0)/subs.length);
+  document.getElementById("cardAvgMarks").textContent = avg;
+
+  // GPA ring
+  const circ = 2*Math.PI*64;
+  document.getElementById("gpaCircle").style.strokeDashoffset = circ - (gpa/10)*circ;
+  document.getElementById("gpaNum").textContent = gpa.toFixed(1);
+  const gb = document.getElementById("gpaGradeBadge");
+  gb.textContent = gpaLbl.l;
+  gb.style.cssText = `background:${gpaLbl.bg};color:${gpaLbl.color};`;
+
+  // Bar chart
+  barChart.data.labels = subs.map(s=>s.name.split(" ").pop());
+  barChart.data.datasets = [
+    {label:"Internal", data:subs.map(s=>s.internal), backgroundColor:"rgba(58,134,255,0.75)", hoverBackgroundColor:"#3a86ff"},
+    {label:"External", data:subs.map(s=>s.external), backgroundColor:"rgba(131,56,236,0.75)", hoverBackgroundColor:"#8338ec"},
+  ];
+  barChart.update();
+
+  // Line chart
+  lineChart.data.datasets = [{
+    label: s.name+" GPA", data: s.gpa,
+    borderColor:"#3a86ff", backgroundColor:"rgba(58,134,255,0.15)", fill:true,
+    pointBackgroundColor:"#3a86ff", pointBorderColor:"#fff", pointBorderWidth:2,
+  }];
+  lineChart.update();
+
+  // Doughnut
+  doughnutChart.data.datasets = [{
+    data:[s.attendance, 100-s.attendance],
+    backgroundColor:["#06d6a0","rgba(0,0,0,0.08)"],
+    borderWidth:0, hoverOffset:6,
+  }];
+  doughnutChart.update();
+
+  // Radar
+  radarChart.data.datasets = [{
+    label:"Skills", data:s.skills,
+    borderColor:"#fb5607", backgroundColor:"rgba(251,86,7,0.18)",
+    pointBackgroundColor:"#fb5607", pointBorderColor:"#fff", pointBorderWidth:2, borderWidth:2,
+  }];
+  radarChart.update();
+
+  // Marks table
+  const tbody = document.getElementById("marksTableBody");
+  tbody.innerHTML = "";
+  subs.forEach(sub => {
+    const total = sub.internal + sub.external;
+    const gr    = getGrade(Math.round((total/130)*100));
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><strong>${sub.name}</strong></td>
+      <td>${sub.internal}/50</td>
+      <td>${sub.external}/80</td>
+      <td><strong>${total}/130</strong></td>
+      <td><span class="grade-pill" style="background:${gr.bg};color:${gr.color}">${gr.g}</span></td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  // Progress bars
+  const list = document.getElementById("progressList");
+  list.innerHTML = "";
+  s.assignments.forEach((pct,i) => {
+    const color = progressColors[i];
+    const div = document.createElement("div");
+    div.className = "progress-item";
+    div.innerHTML = `
+      <div class="progress-meta">
+        <div class="progress-label">${subs[i].name}</div>
+        <div class="progress-pct" style="color:${color}">${pct}%</div>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" style="background:${color};width:0" data-width="${pct}%"></div>
+      </div>
+    `;
+    list.appendChild(div);
+  });
+  setTimeout(()=>{
+    document.querySelectorAll(".progress-fill").forEach(el=>{ el.style.width=el.dataset.width; });
+  }, 80);
+}
+
+/* ── DARK MODE ── */
+function toggleDark() {
+  const isDark = document.documentElement.getAttribute("data-theme")==="dark";
+  document.documentElement.setAttribute("data-theme", isDark?"":"dark");
+  document.querySelector(".btn-ghost").textContent = isDark?"🌙 Dark Mode":"☀️ Light Mode";
+  const tc = isDark?"#888":"#cdd8e0";
+  const gc = isDark?"rgba(0,0,0,0.06)":"rgba(255,255,255,0.07)";
+  [barChart,lineChart].forEach(c=>{
+    c.options.scales.x.ticks.color=tc;
+    c.options.scales.y.ticks.color=tc;
+    c.options.scales.y.grid.color=gc;
+    c.update();
+  });
+  radarChart.options.scales.r.pointLabels.color=tc;
+  radarChart.options.scales.r.grid.color=isDark?"rgba(0,0,0,0.08)":"rgba(255,255,255,0.07)";
+  radarChart.update();
+}
+
+/* ── PDF DOWNLOAD ── */
+async function downloadPDF() {
+  const btn = document.querySelector(".btn-primary");
+  btn.textContent="⏳ Generating..."; btn.disabled=true;
+  try {
+    const canvas = await html2canvas(document.getElementById("mainWrapper"),{scale:1.5,useCORS:true,backgroundColor:"#0f2027"});
+    const {jsPDF} = window.jspdf;
+    const pdf = new jsPDF({orientation:"landscape",unit:"px",format:[canvas.width/1.5,canvas.height/1.5]});
+    pdf.addImage(canvas.toDataURL("image/png"),"PNG",0,0,canvas.width/1.5,canvas.height/1.5);
+    pdf.save(`${students[parseInt(document.getElementById("studentSelect").value)].name.replace(" ","_")}_Report.pdf`);
+  } catch(e) { alert("PDF generation failed. Try again."); }
+  btn.textContent="⬇ PDF Report"; btn.disabled=false;
+}
+
+/* ── INIT ── */
+window.addEventListener("load",()=>{
+  setTimeout(()=>{
+    document.getElementById("loader").classList.add("hidden");
+    const w = document.getElementById("mainWrapper");
+    w.classList.add("visible");
+    createCharts();
+    updateDashboard();
+  }, 1200);
+});
+</script>
+</body>
+</html>

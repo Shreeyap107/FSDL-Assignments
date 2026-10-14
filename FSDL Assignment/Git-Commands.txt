@@ -1,0 +1,9 @@
+FSDL Assignment: Git Commands
+
+Aim:
+To explore Git commands for local repository,
+remote repository, and log operations.
+
+Commands:
+add, commit, status, log, show, branch,
+checkout, merge, clone, pull, reset, revert, rebase.
